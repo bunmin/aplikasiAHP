@@ -14,5 +14,8 @@
 // Route::get('/', function () {
 //     return view('layouts.app');
 // });
+Auth::routes();
+
 Route::get('/', 'HomeController@index')->name('home.index');
 Route::get('/topik', 'TopikController@index')->name('topik.index');
+Route::post('/topik', 'TopikController@storeTopik')->name('topik.tambah');
