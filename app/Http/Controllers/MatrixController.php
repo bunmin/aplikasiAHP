@@ -61,7 +61,7 @@ class MatrixController extends Controller
         return view('matrix.kriteria', [
             'user' => $user,
             'class' => "topik",
-            'title' => "Matrix Perbandingan : Kriteria",
+            'title' => "Matrix Kriteria",
             'topik' => $topik,
             'kriterias' => $kriterias,
         ]);
