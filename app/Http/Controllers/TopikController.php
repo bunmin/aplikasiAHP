@@ -89,6 +89,33 @@ class TopikController extends Controller
         return response()->json($kriterias, 200);
     }
 
+    public function getKriteria(Request $request)
+    {
+        $kriteria = kriteria::where('id',$request->id)->first();
+
+        return response()->json($kriteria, 200);
+    }
+
+    public function updateKriteria(Request $request, $topikId)
+    {
+        $data = [
+            'nama' => $request->kriteria,
+        ];
+        kriteria::where('id',$request->id)->update($data);
+        $kriterias = kriteria::where('topik_id',$topikId)->get();
+
+        return response()->json($kriterias, 200);
+    }
+
+    public function deleteKriteria(Request $request, $topikId)
+    {
+        kriteria::where('id',$request->id)->delete();
+        $kriterias = kriteria::where('topik_id',$topikId)->get();
+
+        return response()->json($kriterias, 200);
+    }
+
+
     public function storeAlternatif(Request $request, $topikId)
     {
         $error = 0;
@@ -108,7 +135,32 @@ class TopikController extends Controller
 
         $alternatifs = alternatif::where('topik_id',$topikId)->get();
 
-        // return redirect('/topik/detail/'.$topikId)->with($message);
+        return response()->json($alternatifs, 200);
+    }
+
+    public function getAlternatif(Request $request)
+    {
+        $alternatif = alternatif::where('id',$request->id)->first();
+
+        return response()->json($alternatif, 200);
+    }
+
+    public function updateAlternatif(Request $request, $topikId)
+    {
+        $data = [
+            'nama' => $request->alternatif,
+        ];
+        alternatif::where('id',$request->id)->update($data);
+        $alternatifs = alternatif::where('topik_id',$topikId)->get();
+
+        return response()->json($alternatifs, 200);
+    }
+
+    public function deleteAlternatif(Request $request, $topikId)
+    {
+        alternatif::where('id',$request->id)->delete();
+        $alternatifs = alternatif::where('topik_id',$topikId)->get();
+
         return response()->json($alternatifs, 200);
     }
 }

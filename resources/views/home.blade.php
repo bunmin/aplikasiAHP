@@ -1,4 +1,7 @@
 @extends('layouts.app')
+
+@section('title', $title)
+
 @push('last-header')
 @endpush
 

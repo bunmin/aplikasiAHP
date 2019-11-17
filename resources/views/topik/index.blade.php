@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', $title)
+
 @push('last-header')
 <!-- DataTables -->
 <link rel="stylesheet" href="{{ asset('bower_components/admin-lte/plugins/datatables-bs4/css/dataTables.bootstrap4.css') }}">
@@ -58,6 +60,7 @@
                                 <td> {{$topik['keterangan']}} </td>
                                 <td>
                                     <a href="{{ route('topik.detail', $topik['id']) }}" class="btn btn-sm btn-info"><i class="fas fa-plus"></i></a>
+                                    <a href="{{ route('matrix.index', $topik['id']) }}" class="btn btn-sm btn-primary">Matrix</a>
                                 </td>
                             </tr>
                             @endforeach
