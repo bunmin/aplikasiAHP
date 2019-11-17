@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\alternatif;
+use App\kriteria;
 use App\topik;
 use Illuminate\Http\Request;
 use Auth;
@@ -18,7 +20,7 @@ class TopikController extends Controller
         $user = Auth::user();
         $topik = topik::where('user_id',auth::user()->id)->get();
 
-        return view('topik', [
+        return view('topik.index', [
             'user' => $user,
             'class' => "topik",
             'title' => "Topik",
@@ -45,5 +47,68 @@ class TopikController extends Controller
         }
 
         return redirect('topik')->with($message);
+    }
+
+    public function detail($topikId)
+    {
+        $user = Auth::user();
+        $topik = topik::where('id',$topikId)->first();
+        $alterntifs = alternatif::where('topik_id',$topikId)->get();
+        $kriterias = kriteria::where('topik_id',$topikId)->get();
+
+        return view('topik.detail', [
+            'user' => $user,
+            'class' => "topik",
+            'title' => "Detail Topik",
+            'topik' => $topik,
+            'alterntifs' => $alterntifs,
+            'kriterias' => $kriterias,
+        ]);
+    }
+
+    public function storeKriteria(Request $request, $topikId)
+    {
+        $error = 0;
+
+        $data = [
+            'user_id' => auth::user()->id,
+            'topik_id' => $topikId,
+            'nama' => $request->kriteria,
+        ];
+        kriteria::create($data);
+
+        if ($error > 0) {
+            $message = ['error' => 'Gagal simpan'];
+        }else{
+            $message = ['message' => 'Berhasil simpan'];
+        }
+
+        $kriterias = kriteria::where('topik_id',$topikId)->get();
+
+        // return redirect('/topik/detail/'.$topikId)->refresh()->with($message);
+        return response()->json($kriterias, 200);
+    }
+
+    public function storeAlternatif(Request $request, $topikId)
+    {
+        $error = 0;
+
+        $data = [
+            'user_id' => auth::user()->id,
+            'topik_id' => $topikId,
+            'nama' => $request->alternatif,
+        ];
+        alternatif::create($data);
+
+        if ($error > 0) {
+            $message = ['error' => 'Gagal simpan'];
+        }else{
+            $message = ['message' => 'Berhasil simpan'];
+        }
+
+        $alternatifs = alternatif::where('topik_id',$topikId)->get();
+
+        // return redirect('/topik/detail/'.$topikId)->with($message);
+        return response()->json($alternatifs, 200);
     }
 }

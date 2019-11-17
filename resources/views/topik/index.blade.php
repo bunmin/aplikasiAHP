@@ -56,7 +56,9 @@
                                 <td> {{ $loop->iteration }} </td>
                                 <td> {{$topik['judul']}} </td>
                                 <td> {{$topik['keterangan']}} </td>
-                                <td></td>
+                                <td>
+                                    <a href="{{ route('topik.detail', $topik['id']) }}" class="btn btn-sm btn-info"><i class="fas fa-plus"></i></a>
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
