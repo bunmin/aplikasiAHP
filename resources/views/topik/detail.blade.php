@@ -5,7 +5,6 @@
 @push('last-header')
 <!-- DataTables -->
 <link rel="stylesheet" href="{{ asset('bower_components/admin-lte/plugins/datatables-bs4/css/dataTables.bootstrap4.css') }}">
-<link rel="stylesheet" href="{{ asset('bower_components/sweetalert2/dist/sweetalert2.min.css') }}">
 @endpush
 
 @section('content')
@@ -279,7 +278,6 @@
 <!-- DataTables -->
 <script src="{{ asset('bower_components/admin-lte/plugins/datatables/jquery.dataTables.js') }}"></script>
 <script src="{{ asset('bower_components/admin-lte/plugins/datatables-bs4/js/dataTables.bootstrap4.js') }}"></script>
-<script src="{{ asset('bower_components/sweetalert2/dist/sweetalert2.all.min.js')}}"></script>
 <script>
     $(function () {
       $('#table-kriteria').DataTable();
@@ -371,7 +369,7 @@
         $('#kriteriaId').val(kriteriaId);
 
         $.ajax({
-            url : "{{ route('topik.kriteria.get',) }}",
+            url : "{{ route('topik.kriteria.get') }}",
             type : "GET",
             dataType : "json",
             data : {"id":kriteriaId},

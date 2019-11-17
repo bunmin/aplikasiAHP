@@ -13,7 +13,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Aplikasi AHP') }} @yield('title', '')</title>
+    <title>{{ config('app.name', 'Aplikasi AHP') }} | @yield('title', '')</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('bower_components/admin-lte/plugins/fontawesome-free/css/all.min.css') }}">
@@ -21,6 +21,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="stylesheet" href="{{ asset('bower_components/admin-lte/dist/css/adminlte.min.css') }}">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ asset('bower_components/sweetalert2/dist/sweetalert2.min.css') }}">
     @stack('last-header')
 </head>
 
@@ -159,6 +161,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="{{ asset('bower_components/admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <!-- AdminLTE App -->
     <script src="{{ asset('bower_components/admin-lte/dist/js/adminlte.min.js') }}"></script>
+
+    <script src="{{ asset('bower_components/sweetalert2/dist/sweetalert2.all.min.js')}}"></script>
     @stack('after-footer')
 </body>
 

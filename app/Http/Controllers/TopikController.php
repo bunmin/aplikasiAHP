@@ -36,7 +36,7 @@ class TopikController extends Controller
         $data = [
             'user_id' => auth::user()->id,
             'judul' => $request->judultopik,
-            'keterangan' => $request->judultopik,
+            'keterangan' => $request->keterangan,
         ];
         topik::create($data);
 

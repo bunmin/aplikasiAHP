@@ -34,3 +34,8 @@ Route::post('/topik/alternatif/edit/{tenderId}', 'TopikController@updateAlternat
 Route::post('/topik/alternatif/del/{tenderId}', 'TopikController@deleteAlternatif')->name('topik.alternatif.delete');
 
 Route::get('/matrix/{topikId}', 'MatrixController@index')->name('matrix.index');
+Route::get('/matrix/kriteria/{topikId}', 'MatrixController@matrixKriteria')->name('matrix.kriteria');
+Route::get('/matrix/kriteria/getall/{topikId}', 'MatrixController@KriteriaGetAll')->name('matrix.kriteria.getall');
+Route::get('/matrix/kriteria/getanother/{topikId}', 'MatrixController@KriteriaGetAnother')->name('matrix.kriteria.getanother');
+Route::POST('/matrix/kriteria/updatekriteriabobot/{topikId}', 'MatrixController@updateKriteriaBobot')->name('matrix.kriteria.updatebobot');
+Route::get('/matrix/kriteria/getcr/{topikId}', 'MatrixController@getKriteriaCR')->name('matrix.kriteria.getcr');
