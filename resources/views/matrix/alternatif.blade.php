@@ -44,11 +44,11 @@
                     <dl>
                         <div class="form-group">
                             <label for="judultopik">Judul Topik</label>
-                            <input type="text" class="form-control" id="judultopik" placeholder="Judul Topik" name="judultopik" value="{{ $topik->judul }}" disabled>
+                            <input type="text" class="form-control" id="judultopik" placeholder="Judul Topik" name="judultopik" value="{{ $topik->judul }}"" disabled>
                         </div>
                         <div class="form-group">
-                            <label for="keterangan">Keterangan</label>
-                            <textarea class="form-control" name="keterangan" id="keterangan" cols="30" rows="4" disabled> {{ $topik->keterangan }} </textarea>
+                            <label for="kriteria">Kriteria</label>
+                            <input type="text" class="form-control" id="kriteria" placeholder="Kriteria" value="{{ $kriteria->nama }}"" disabled>
                         </div>
                     </dl>
                 </div>
@@ -60,21 +60,21 @@
             <div class="card-body">
                 <div class="card-header">
                     <h3 class="card-title">
-                        Matrix Kriteria
+                        Matrix Alternatif
                     </h3>
                 </div>
 
                 <div class="card-body">
                     <div class="form-group">
-                        <form role="form" enctype="multipart/form-data" role="form" method="POST" action="{{route('matrix.kriteria.updatebobot',$topik->id)}}" id="simpanbobot">
+                        <form role="form" enctype="multipart/form-data" role="form" method="POST" action="{{route('matrix.alternatif.updatebobot',[$topik->id,$kriteria->id])}}" id="simpanbobot">
                             @csrf
                             <div class="row">
                                 <div class="col-sm-3">
                                     <div class="form-group">
-                                        <select class="custom-select" id="opsi-kriteria-kiri" name="bobotkiri">
-                                            <option>--Pilih Kriteria--</option>
-                                            @foreach ($kriterias as $kriteria)
-                                            <option value="{{ $kriteria->id }}"> {{ $kriteria->nama }} </option>
+                                        <select class="custom-select" id="opsi-alternatif-kiri" name="bobotkiri">
+                                            <option>--Pilih Alternatif--</option>
+                                            @foreach ($alternatifs as $alternatif)
+                                            <option value="{{ $alternatif->id }}"> {{ $alternatif->nama }} </option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -105,8 +105,8 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="form-group">
-                                        <select class="custom-select" id="opsi-kriteria-kanan" name="bobotkanan">
-                                            <option>--Pilih Kriteria--</option>
+                                        <select class="custom-select" id="opsi-alternatif-kanan" name="bobotkanan">
+                                            <option>--Pilih Alternatif--</option>
                                         </select>
                                     </div>
                                 </div>
@@ -151,7 +151,7 @@
 
     function inserttablematrix(){
         $.ajax({
-            url : "{{ route('matrix.kriteria.getall',$topik->id) }}",
+            url : "{{ route('matrix.alternatif.getall',[$topik->id,$kriteria->id]) }}",
             type : "GET",
             dataType : "json",
             data : {},
@@ -163,7 +163,7 @@
 
     function getCR(){
         $.ajax({
-            url : "{{ route('matrix.kriteria.getcr',$topik->id) }}",
+            url : "{{ route('matrix.alternatif.getcr',[$topik->id,$kriteria->id]) }}",
             type : "GET",
             dataType : "json",
             data : {},
@@ -174,14 +174,13 @@
     }
 
     $(function () {
-    //   $('#table-kriteria').DataTable();
         inserttablematrix();
         getCR();
 
         Swal.close();
     });
 
-    $("#opsi-kriteria-kiri").change(function(e) {
+    $("#opsi-alternatif-kiri").change(function(e) {
         e.preventDefault();
 
         Swal.fire({
@@ -190,20 +189,20 @@
             },
         })
 
-        var kriteriaId = $(this).val();
+        var alternatifId = $(this).val();
 
         $.ajax({
             type: "GET",
-            url: "{{ route('matrix.kriteria.getanother',$topik->id) }}",
-            data: {'kriteriaid':kriteriaId},
+            url: "{{ route('matrix.alternatif.getanother',$topik->id) }}",
+            data: {'alternatifid':alternatifId},
             success: function(response)
             {
-                var html = "<option>--Pilih Kriteria--</option>";
+                var html = "<option>--Pilih Alternatif--</option>";
                 response.forEach(function(element, index){
                     html += '<option value="'+element.id+'">'+element.nama+'</option>';
                 })
 
-                $("#opsi-kriteria-kanan").empty().append(html);
+                $("#opsi-alternatif-kanan").empty().append(html);
 
                 Swal.close();
             }

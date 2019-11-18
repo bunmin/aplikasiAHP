@@ -45,7 +45,7 @@
                     <dl>
                         <div class="form-group">
                             <label for="judultopik">Judul Topik</label>
-                            <input type="text" class="form-control" id="judultopik" placeholder="Judul Topik" name="judultopik" value={{ $topik->judul }} disabled>
+                            <input type="text" class="form-control" id="judultopik" placeholder="Judul Topik" name="judultopik" value="{{ $topik->judul }}" disabled>
                         </div>
                         <div class="form-group">
                             <label for="keterangan">Keterangan</label>

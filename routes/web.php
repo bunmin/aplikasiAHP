@@ -39,3 +39,9 @@ Route::get('/matrix/kriteria/getall/{topikId}', 'MatrixController@KriteriaGetAll
 Route::get('/matrix/kriteria/getanother/{topikId}', 'MatrixController@KriteriaGetAnother')->name('matrix.kriteria.getanother');
 Route::POST('/matrix/kriteria/updatekriteriabobot/{topikId}', 'MatrixController@updateKriteriaBobot')->name('matrix.kriteria.updatebobot');
 Route::get('/matrix/kriteria/getcr/{topikId}', 'MatrixController@getKriteriaCR')->name('matrix.kriteria.getcr');
+
+Route::get('/matrix/alternatif/{topikId}/{kriteriaId}', 'MatrixController@matrixAlternatif')->name('matrix.alternatif');
+Route::get('/matrix/getalternatif/getall/{topikId}/{kriteriaId}', 'MatrixController@AlternatifGetAll')->name('matrix.alternatif.getall');
+Route::get('/matrix/getalternatif/getanother/{topikId}', 'MatrixController@AlternatifGetAnother')->name('matrix.alternatif.getanother');
+Route::POST('/matrix/updatealternatifbobot/{topikId}/{kriteriaId}', 'MatrixController@updateAlternatifBobot')->name('matrix.alternatif.updatebobot');
+Route::get('/matrix/getalternatif/getcr/{topikId}/{alternatifId}', 'MatrixController@getAlternatifCR')->name('matrix.alternatif.getcr');
