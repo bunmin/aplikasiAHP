@@ -338,11 +338,11 @@
                 $('#kriteria').val("");
 
                 Swal.close();
-                Swal.fire({
-                    type: 'success',
-                    title: 'Berhasil',
-                    text: 'Data berhasil tersimpan!',
-                })
+                // Swal.fire({
+                //     type: 'success',
+                //     title: 'Berhasil',
+                //     text: 'Data berhasil tersimpan!',
+                // })
             },
             error : function(response){
                 Swal.close();
@@ -478,11 +478,11 @@
                 $('#alternatif').val("");
 
                 Swal.close();
-                Swal.fire({
-                    type: 'success',
-                    title: 'Berhasil',
-                    text: 'Data berhasil tersimpan!',
-                })
+                // Swal.fire({
+                //     type: 'success',
+                //     title: 'Berhasil',
+                //     text: 'Data berhasil tersimpan!',
+                // })
             },
             error : function(response){
                 Swal.close();
