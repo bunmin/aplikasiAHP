@@ -87,14 +87,23 @@
                                     <td> Kriteria </td>
                                     <td>
                                         <a href="{{ route('matrix.kriteria', $topik['id']) }}" type="button" class="btn btn-sm btn-primary" >Input Matrix</a>
+                                        @if($cekKriteriaHasil == 0)
+                                        <button type="submit" class="btn btn-sm btn-success" data-toggle="modal" data-target="#chartHasilKriteria">Hasil</button>
+                                        @endif
                                     </td>
                                 </tr>
                                 @foreach ($kriterias as $kriteria)
+                                @php
+                                    $cekAlternatifHasil =  App\Http\Controllers\MatrixController::cekAlternatifHasil($topik->id,$kriteria->id);
+                                @endphp
                                 <tr>
                                     <td> {{ $loop->iteration }} </td>
                                     <td> {{$kriteria['nama']}}</td>
                                     <td>
                                         <a href="{{ route('matrix.alternatif', [$topik['id'] , $kriteria['id']]) }}" type="button" class="btn btn-sm btn-primary" >Input Matrix</a>
+                                        @if($cekAlternatifHasil == 0)
+                                        <button type="submit" class="btn btn-sm btn-success" data-id="{{ $kriteria['id'] }}" data-toggle="modal" data-target="#chartHasilAlternatif">Hasil</button>
+                                        @endif
                                     </td>
                                 </tr>
                                 @endforeach
@@ -106,6 +115,49 @@
         </div>
         <!-- /.card-body -->
     </div>
+    <!-- /.card -->
+    <div class="modal fade" id="chartHasilKriteria">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Hasil Kriteria</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="chart_div_kriteria"></div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    <div class="modal fade" id="chartHasilAlternatif">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Hasil Alternatif</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="chart_div_alternatif"></div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
 </section>
 @endsection
 
@@ -113,9 +165,135 @@
 <!-- DataTables -->
 <script src="{{ asset('bower_components/admin-lte/plugins/datatables/jquery.dataTables.js') }}"></script>
 <script src="{{ asset('bower_components/admin-lte/plugins/datatables-bs4/js/dataTables.bootstrap4.js') }}"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
+    Swal.fire({
+        onBeforeOpen: () => {
+            Swal.showLoading()
+        },
+    })
+
     $(function () {
       $('#table-kriteria').DataTable();
+
+      Swal.close();
+    });
+
+    function drawChartKriteria(response) {
+
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Nama Kriteria');
+        data.addColumn('number', 'Nilai Rata Rata');
+        data.addColumn({type:'string', role:'style'});
+        response.forEach(function(element, index){
+            data.addRows([
+                [element.nama, element.rata_rata_nilai,getRandomColor()],
+            ]);
+        })
+
+        var options = {
+            // title: "Density of Precious Metals, in g/cm^3",
+            width: '750',
+            height: '200',
+            bar: {groupWidth: "95%"},
+            legend: { position: "none" },
+        };
+
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div_kriteria'));
+        chart.draw(data,options);
+
+        Swal.close();
+        }
+
+    $("#chartHasilKriteria").on('show.bs.modal', function(event){
+        Swal.fire({
+            onBeforeOpen: () => {
+                Swal.showLoading()
+            },
+        })
+
+        $.ajax({
+            type: "GET",
+            url: "{{ route('matrix.kriteria.getnilai',$topik->id) }}",
+            data: {},
+            success: function(response)
+            {
+                google.charts.load('current', {
+                    callback: function () {
+                        drawChartKriteria(response);
+                    },
+                    packages: ['corechart', 'bar']
+                });
+            },
+            error : function(response){
+                Swal.close();
+                Swal.fire({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: 'Data gagal diambil!',
+                })
+            }
+        });
+    });
+
+    function drawChartAlternatif(response) {
+
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Nama Alternatif');
+        data.addColumn('number', 'Nilai Rata Rata');
+        data.addColumn({type:'string', role:'style'});
+        response.forEach(function(element, index){
+            data.addRows([
+                [element.nama, element.rata_rata_nilai,getRandomColor()],
+            ]);
+        })
+
+        var options = {
+            // title: "Density of Precious Metals, in g/cm^3",
+            width: '750',
+            height: '200',
+            bar: {groupWidth: "95%"},
+            legend: { position: "none" },
+        };
+
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div_alternatif'));
+        chart.draw(data,options);
+
+        Swal.close();
+    }
+
+    $("#chartHasilAlternatif").on('show.bs.modal', function(event){
+        Swal.fire({
+            onBeforeOpen: () => {
+                Swal.showLoading()
+            },
+        })
+
+        var button = $(event.relatedTarget);
+        var kriteriaId = button.data('id');
+
+        $.ajax({
+            type: "GET",
+            url: "{{ route('matrix.alternatif.getnilai',[$topik->id]) }}",
+            data: {'kriteriaId':kriteriaId},
+            success: function(response)
+            {
+                google.charts.load('current', {
+                    callback: function () {
+                        drawChartAlternatif(response);
+                    },
+                    packages: ['corechart', 'bar']
+                });
+            },
+            error : function(response){
+                Swal.close();
+                Swal.fire({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: 'Data gagal diambil!',
+                })
+            }
+        });
     });
 </script>
 @endpush

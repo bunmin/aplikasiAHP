@@ -17,6 +17,7 @@
 Auth::routes();
 
 Route::get('/', 'HomeController@index')->name('home.index');
+Route::get('/home', 'HomeController@index')->name('home.index');
 
 Route::get('/topik', 'TopikController@index')->name('topik.index');
 Route::post('/topik', 'TopikController@storeTopik')->name('topik.tambah');
@@ -39,9 +40,16 @@ Route::get('/matrix/kriteria/getall/{topikId}', 'MatrixController@KriteriaGetAll
 Route::get('/matrix/kriteria/getanother/{topikId}', 'MatrixController@KriteriaGetAnother')->name('matrix.kriteria.getanother');
 Route::POST('/matrix/kriteria/updatekriteriabobot/{topikId}', 'MatrixController@updateKriteriaBobot')->name('matrix.kriteria.updatebobot');
 Route::get('/matrix/kriteria/getcr/{topikId}', 'MatrixController@getKriteriaCR')->name('matrix.kriteria.getcr');
+Route::get('/matrix/kriteria/cekhasil/{topikId}', 'MatrixController@cekKriteriaHasil')->name('matrix.kriteria.cekhasil');
+Route::get('/matrix/kriteria/getnilai/{topikId}', 'MatrixController@getKriteriaNilai')->name('matrix.kriteria.getnilai');
 
 Route::get('/matrix/alternatif/{topikId}/{kriteriaId}', 'MatrixController@matrixAlternatif')->name('matrix.alternatif');
 Route::get('/matrix/getalternatif/getall/{topikId}/{kriteriaId}', 'MatrixController@AlternatifGetAll')->name('matrix.alternatif.getall');
 Route::get('/matrix/getalternatif/getanother/{topikId}', 'MatrixController@AlternatifGetAnother')->name('matrix.alternatif.getanother');
 Route::POST('/matrix/updatealternatifbobot/{topikId}/{kriteriaId}', 'MatrixController@updateAlternatifBobot')->name('matrix.alternatif.updatebobot');
-Route::get('/matrix/getalternatif/getcr/{topikId}/{alternatifId}', 'MatrixController@getAlternatifCR')->name('matrix.alternatif.getcr');
+Route::get('/matrix/getalternatif/getcr/{topikId}/{kriteriaId}', 'MatrixController@getAlternatifCR')->name('matrix.alternatif.getcr');
+Route::get('/matrix/getalternatif/cekhasil/{topikId}/{kriteriaId}', 'MatrixController@cekAlternatifHasil')->name('matrix.alternatif.cekhasil');
+Route::get('/matrix/getalternatif/getnilai/{topikId}', 'MatrixController@getAlternatifNilai')->name('matrix.alternatif.getnilai');
+
+// Route::get('/matrix/hitungtotal/{topikId}', 'MatrixController@hitungTotal')->name('matrix.hitungtotal');
+Route::get('/gettotal', 'MatrixController@getTotal')->name('matrix.gettotal');

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateJumlahNilaisTable extends Migration
+class CreateTotalKeseluruhansTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,12 @@ class CreateJumlahNilaisTable extends Migration
      */
     public function up()
     {
-        Schema::create('jumlah_nilais', function (Blueprint $table) {
+        Schema::create('total_keseluruhans', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->integer('user_id');
             $table->integer('topik_id');
-            $table->integer('kriteria_id')->nullable();
-            $table->integer('alternatif_id')->nullable();
-            $table->float('jumlah_nilai');
-            $table->float('rata_rata_nilai');
+            $table->integer('alternatif_id');
+            $table->float('nilai_bobot');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -32,6 +31,6 @@ class CreateJumlahNilaisTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('jumlah_nilais');
+        Schema::dropIfExists('total_keseluruhans');
     }
 }

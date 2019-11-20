@@ -70,6 +70,8 @@
                         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
                     </div>
                     <div class="row">
+                        <div class="col-8">
+                        </div>
                         <!-- /.col -->
                         <div class="col-4">
                             <button type="submit" class="btn btn-primary btn-block">Masuk</button>
@@ -77,6 +79,12 @@
                         <!-- /.col -->
                     </div>
                 </form>
+                <div class="text-center mb-3">
+                    <p>- ATAU -</p>
+                    <a href="{{ route('register') }}" class="btn btn-block btn-success">
+                        <i class="fas fa-user-plus mr-2"></i>Daftar
+                    </a>
+                </div>
             </div>
             <!-- /.login-card-body -->
         </div>

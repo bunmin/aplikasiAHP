@@ -127,21 +127,54 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <div class="card-body table-responsive p-0" style="height: 300px;">
                             <table class="table table-bordered">
                                 <tbody id="table-matrix-tbody">
 
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                    <div class="form-group row" id="hasil-perbandingan">
+                        <div class="form-group middle">
+                            <button type="submit" class="btn btn-success" data-toggle="modal" data-target="#chartHasil">
+                                {{-- <i class="fas fa-save"></i> --}}
+                                Hasil
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <!-- /.card-body -->
     </div>
+
+    <div class="modal fade" id="chartHasil">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Hasil Alternatif</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="chart_div"></div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
 </section>
 @endsection
 
 @push('after-footer')
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
     Swal.fire({
         onBeforeOpen: () => {
@@ -173,9 +206,25 @@
         })
     }
 
+    function cekHasil(){
+        $.ajax({
+            url : "{{ route('matrix.alternatif.cekhasil',[$topik->id,$kriteria->id]) }}",
+            type : "GET",
+            dataType : "json",
+            data : {},
+            success : function(response){
+                if (response == 0){
+                    $('#hasil-perbandingan').show();
+                }
+            }
+        })
+    }
+
     $(function () {
+        $('#hasil-perbandingan').hide();
         inserttablematrix();
         getCR();
+        cekHasil()
 
         Swal.close();
     });
@@ -229,6 +278,7 @@
             {
                 inserttablematrix();
                 getCR();
+                cekHasil();
 
                 Swal.close();
                 Swal.fire({
@@ -246,6 +296,63 @@
                 })
             }
 
+        });
+    });
+
+    function drawChart(response) {
+
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Nama Alternatif');
+        data.addColumn('number', 'Nilai Rata Rata');
+        data.addColumn({type:'string', role:'style'});
+        response.forEach(function(element, index){
+            data.addRows([
+                [element.nama, element.rata_rata_nilai,getRandomColor()],
+            ]);
+        })
+
+        var options = {
+            // title: "Density of Precious Metals, in g/cm^3",
+            width: '750',
+            height: '200',
+            bar: {groupWidth: "95%"},
+            legend: { position: "none" },
+        };
+
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+        chart.draw(data,options);
+
+        Swal.close();
+    }
+
+    $("#chartHasil").on('show.bs.modal', function(event){
+        Swal.fire({
+            onBeforeOpen: () => {
+                Swal.showLoading()
+            },
+        })
+
+        $.ajax({
+            type: "GET",
+            url: "{{ route('matrix.alternatif.getnilai',[$topik->id]) }}",
+            data: {'kriteriaId':  {{$kriteria->id}}},
+            success: function(response)
+            {
+                google.charts.load('current', {
+                    callback: function () {
+                        drawChart(response);
+                    },
+                    packages: ['corechart', 'bar']
+                });
+            },
+            error : function(response){
+                Swal.close();
+                Swal.fire({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: 'Data gagal diambil!',
+                })
+            }
         });
     });
 

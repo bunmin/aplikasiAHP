@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\alternatif;
 use App\kriteria;
 use App\topik;
+use App\total_keseluruhan;
 use Illuminate\Http\Request;
 use Auth;
+use DB;
 
 class TopikController extends Controller
 {
@@ -18,7 +20,10 @@ class TopikController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $topik = topik::where('user_id',auth::user()->id)->get();
+        $topik = topik::where('user_id',auth::user()->id)
+                ->select('topiks.*', DB::raw('(select count(*) from total_keseluruhans where topik_id = topiks.id) count_total'))
+                ->orderBy('topiks.created_at', 'desc')
+                ->get();
 
         return view('topik.index', [
             'user' => $user,

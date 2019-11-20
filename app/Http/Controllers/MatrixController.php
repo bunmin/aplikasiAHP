@@ -6,10 +6,12 @@ use Illuminate\Http\Request;
 use App\alternatif;
 use App\alternatif_bobot;
 use App\index_random_consistency;
-use App\jumlah_nilai;
+use App\jumlah_nilai_alternatif;
+use App\jumlah_nilai_kriteria;
 use App\kriteria;
 use App\Kriteria_bobot;
 use App\topik;
+use App\total_keseluruhan;
 use DB;
 use Auth;
 
@@ -35,6 +37,7 @@ class MatrixController extends Controller
             'topik' => $topik,
             'alterntifs' => $alterntifs,
             'kriterias' => $kriterias,
+            'cekKriteriaHasil' => $this->cekKriteriaHasil($topik->id),
         ]);
     }
 
@@ -145,24 +148,26 @@ class MatrixController extends Controller
             $gettotal = Kriteria_bobot::where('topik_id',$topikId)->where('kriteria_id_baris',$Kriteria->id)->sum('nilai_eigen');
             $getrata2 = $gettotal/$kriteriaCount;
 
-            $cekjumlah = jumlah_nilai::where('kriteria_id',$Kriteria->id)->first();
-            // dd($cekjumlah);
+            $cekjumlah = jumlah_nilai_kriteria::where('kriteria_id',$Kriteria->id)->first();
             if($cekjumlah){
                 $data = [
                     'jumlah_nilai' => $gettotal,
                     'rata_rata_nilai' => $getrata2,
                 ];
-                jumlah_nilai::where('id',$cekjumlah->id)->update($data);
+                jumlah_nilai_kriteria::where('id',$cekjumlah->id)->update($data);
             } else {
                 $data = [
+                    'user_id' => auth::user()->id,
                     'topik_id' => $topikId,
                     'kriteria_id' => $Kriteria->id,
                     'jumlah_nilai' => $gettotal,
                     'rata_rata_nilai' => $getrata2,
                 ];
-                jumlah_nilai::create($data);
+                jumlah_nilai_kriteria::create($data);
             }
         }
+
+        $this->hitungTotal($topikId);
 
         return response()->json("", 200);
     }
@@ -173,7 +178,7 @@ class MatrixController extends Controller
         $lamda = 0;
         foreach ($Kriterias as $Kriteria) {
             $getTotalBobotKolom = Kriteria_bobot::where('topik_id',$topikId)->where('kriteria_id_kolom',$Kriteria->id)->sum('nilai_bobot');
-            $getRata2 = jumlah_nilai::where('topik_id',$topikId)->where('kriteria_id',$Kriteria->id)->select('rata_rata_nilai')->first()->rata_rata_nilai;
+            $getRata2 = jumlah_nilai_kriteria::where('topik_id',$topikId)->where('kriteria_id',$Kriteria->id)->select('rata_rata_nilai')->first()->rata_rata_nilai;
 
             $jumlahPerKriteria = $getTotalBobotKolom * $getRata2;
             $lamda = $lamda + $jumlahPerKriteria;
@@ -187,6 +192,32 @@ class MatrixController extends Controller
 
         return response()->json($CR, 200);
     }
+
+    public function cekKriteriaHasil($topikId)
+    {
+        $cek = Kriteria_bobot::where('topik_id',$topikId)->first();
+        if ($cek) {
+            $count = Kriteria_bobot::where('topik_id',$topikId)->where('nilai_bobot',0)->count();
+        } else {
+            //sebenarnya datanya kosong, tapi untuk tujuan validasi kita kasih nilai ke count
+            $count = 1;
+        }
+
+        // return response()->json($count, 200);
+        return $count;
+    }
+
+    public function getKriteriaNilai($topikId)
+    {
+        $jumlah_nilai = jumlah_nilai_kriteria::where('jumlah_nilai_kriterias.topik_id',$topikId)
+                        ->join('kriterias','kriterias.id','=','jumlah_nilai_kriterias.kriteria_id')
+                        ->select('kriterias.nama','jumlah_nilai_kriterias.rata_rata_nilai')
+                        ->get();
+
+        return response()->json($jumlah_nilai, 200);
+    }
+
+
 
     public function matrixAlternatif($topikId,$kriteriaId)
     {
@@ -298,23 +329,27 @@ class MatrixController extends Controller
             $gettotal = alternatif_bobot::where('kriteria_id',$kriteriaId)->where('alternatif_id_baris',$alternatif->id)->sum('nilai_eigen');
             $getrata2 = $gettotal/$alternatifCount;
 
-            $cekjumlah = jumlah_nilai::where('alternatif_id',$alternatif->id)->first();
+            $cekjumlah = jumlah_nilai_alternatif::where('kriteria_id',$kriteriaId)->where('alternatif_id',$alternatif->id)->first();
             if($cekjumlah){
                 $data = [
                     'jumlah_nilai' => $gettotal,
                     'rata_rata_nilai' => $getrata2,
                 ];
-                jumlah_nilai::where('id',$cekjumlah->id)->update($data);
+                jumlah_nilai_alternatif::where('id',$cekjumlah->id)->update($data);
             } else {
                 $data = [
+                    'user_id' => auth::user()->id,
                     'topik_id' => $topikId,
+                    'kriteria_id' => $kriteriaId,
                     'alternatif_id' => $alternatif->id,
                     'jumlah_nilai' => $gettotal,
                     'rata_rata_nilai' => $getrata2,
                 ];
-                jumlah_nilai::create($data);
+                jumlah_nilai_alternatif::create($data);
             }
         }
+
+        $this->hitungTotal($topikId);
 
         return response()->json("", 200);
     }
@@ -326,7 +361,7 @@ class MatrixController extends Controller
         $lamda = 0;
         foreach ($alternatifs as $alternatif) {
             $getTotalBobotKolom = alternatif_bobot::where('kriteria_id',$kriteriaId)->where('alternatif_id_kolom',$alternatif->id)->sum('nilai_bobot');
-            $getRata2 = jumlah_nilai::where('topik_id',$topikId)->where('alternatif_id',$alternatif->id)->select('rata_rata_nilai')->first()->rata_rata_nilai;
+            $getRata2 = jumlah_nilai_alternatif::where('topik_id',$topikId)->where('kriteria_id',$kriteriaId)->where('alternatif_id',$alternatif->id)->select('rata_rata_nilai')->first()->rata_rata_nilai;
 
             $jumlahPerAlternatif = $getTotalBobotKolom * $getRata2;
             $lamda = $lamda + $jumlahPerAlternatif;
@@ -339,5 +374,90 @@ class MatrixController extends Controller
         $CR = $CI/$IR;
 
         return response()->json($CR, 200);
+    }
+
+    public static function cekAlternatifHasil($topikId,$kriteriaId)
+    {
+        $cek = alternatif_bobot::where('topik_id',$topikId)->where('kriteria_id',$kriteriaId)->first();
+        if ($cek) {
+            $count = alternatif_bobot::where('topik_id',$topikId)->where('kriteria_id',$kriteriaId)->where('nilai_bobot',0)->count();
+        } else {
+            $count = 1;
+        }
+
+        // return response()->json($count, 200);
+        return $count;
+    }
+
+    public function getAlternatifNilai(Request $request,$topikId)
+    {
+        $kriteriaId = $request->kriteriaId;
+        $jumlah_nilai = jumlah_nilai_alternatif::where('jumlah_nilai_alternatifs.topik_id',$topikId)
+                        ->where('jumlah_nilai_alternatifs.kriteria_id',$kriteriaId)
+                        ->join('alternatifs','alternatifs.id','=','jumlah_nilai_alternatifs.alternatif_id')
+                        ->select('alternatifs.nama','jumlah_nilai_alternatifs.rata_rata_nilai')
+                        ->get();
+
+        return response()->json($jumlah_nilai, 200);
+    }
+
+    public function hitungTotal($topikId)
+    {
+        $kriteriaCount = kriteria::where('topik_id',$topikId)->count();
+        $alternatifCount = alternatif::where('topik_id',$topikId)->count();
+
+        $kriteriaCount2 = $kriteriaCount * $kriteriaCount;
+
+        $alternatifCount2 = $alternatifCount * $alternatifCount;
+        $alternatifCount3 = $alternatifCount2 * $kriteriaCount;
+        $cekAlternatif = alternatif_bobot::where('topik_id',$topikId)->where('nilai_bobot',0)->count();
+
+
+        $kriteriaBobotCount = Kriteria_bobot::where('topik_id',$topikId)->count();
+        $alternatifBobotCount = alternatif_bobot::where('topik_id',$topikId)->count();
+
+        if ( $kriteriaCount2 == $kriteriaBobotCount && $this->cekKriteriaHasil($topikId) == 0 && $alternatifCount3 == $alternatifBobotCount && $cekAlternatif == 0){
+            $alternatifs = alternatif::where('topik_id',$topikId)->get();
+            foreach ($alternatifs as $alternatif) {
+                $total = 0;
+                $jumlah_alternatifs = jumlah_nilai_alternatif::where('topik_id',$topikId)->where('alternatif_id',$alternatif->id)->get();
+                foreach ($jumlah_alternatifs as $jumlah_alternatif) {
+                    $rata2kriteria = jumlah_nilai_kriteria::where('kriteria_id',$jumlah_alternatif->kriteria_id)->first()->rata_rata_nilai;
+                    $rata2alternatif = $jumlah_alternatif->rata_rata_nilai;
+
+                    $total = $total + ($rata2kriteria*$rata2alternatif);
+                }
+
+                $total_keseluruhan = total_keseluruhan::where('topik_id',$topikId)->where('alternatif_id',$alternatif->id)->first();
+                if ($total_keseluruhan){
+                    $data = [
+                        'nilai_bobot' => $total,
+                    ];
+                    total_keseluruhan::where('id',$total_keseluruhan->id)->update($data);
+                } else {
+                    $data = [
+                        'user_id' => auth::user()->id,
+                        'topik_id' => $topikId,
+                        'alternatif_id' => $alternatif->id,
+                        'nilai_bobot' => $total,
+                    ];
+                    total_keseluruhan::create($data);
+                }
+            }
+        }
+    }
+
+    public static function getTotal(Request $request)
+    {
+        $total_keseluruhans = total_keseluruhan::where('total_keseluruhans.topik_id',$request->topikId)
+                            ->join('alternatifs','alternatifs.id','=','total_keseluruhans.alternatif_id')
+                            ->select('alternatifs.nama','total_keseluruhans.nilai_bobot')
+                            ->get();
+
+        // echo total_keseluruhan::where('topik_id',$request->topikId)->sum('nilai_bobot');
+        // die();
+
+        return response()->json($total_keseluruhans, 200);
+        // return $count;
     }
 }
