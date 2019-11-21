@@ -508,7 +508,7 @@
         $('#alternatifId').val(alternatifId);
 
         $.ajax({
-            url : "{{ route('topik.alternatif.get',) }}",
+            url : "{{ route('topik.alternatif.get') }}",
             type : "GET",
             dataType : "json",
             data : {"id":alternatifId},
